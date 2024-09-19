@@ -1,0 +1,26 @@
+{
+    "name": "Mojo Dev Container",
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+	"features": {
+		"ghcr.io/va-h/devcontainers-features/uv:1": {}
+	},
+    "postCreateCommand": "/bin/bash -c .devcontainer/postCreateCommand.sh",
+    "customizations": {
+		"vscode": {
+			"settings": {
+				"terminal.integrated.shell.linux": "/bin/bash",
+				"terminal.integrated.copyOnSelection": true,
+				"terminal.integrated.rightClickBehavior": "paste"
+			},
+			"extensions": [
+                "modular-mojotools.vscode-mojo",
+				"mhutchie.git-graph",
+				"DavidAnson.vscode-markdownlint",
+				"yzhang.markdown-all-in-one",
+				"streetsidesoftware.code-spell-checker"
+            ]
+		}
+	}
+}
