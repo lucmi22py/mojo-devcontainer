@@ -3,10 +3,6 @@
     "build": {
         "dockerfile": "Dockerfile"
     },
-	"features": {
-		"ghcr.io/va-h/devcontainers-features/uv:1": {}
-	},
-    "postCreateCommand": "/bin/bash -c .devcontainer/postCreateCommand.sh",
     "customizations": {
 		"vscode": {
 			"settings": {

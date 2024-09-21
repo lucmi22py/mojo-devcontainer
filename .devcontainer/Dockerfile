@@ -1,18 +1,45 @@
-# ベースイメージを指定
-FROM mcr.microsoft.com/devcontainers/base:jammy
+# Ubuntu 22.04 LTSの公式イメージをベースに使用
+FROM ubuntu:22.04
 
-# デフォルトのシェルをbashに設定
+# パッケージインストール時にインタラクティブなプロンプトが表示されないように設定
+ENV DEBIAN_FRONTEND=noninteractive
+
+# 必要なパッケージをインストール
+RUN apt-get update && apt-get install -y \
+    wget \
+    curl \
+    git \
+    build-essential \
+    ca-certificates \
+    sudo \
+    bash \
+    && rm -rf /var/lib/apt/lists/*
+
+# 非rootユーザー 'vscode' を作成し、sudo権限を付与
+RUN useradd -m vscode && echo "vscode ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/nopasswd && \
+    chmod 0440 /etc/sudoers.d/nopasswd
+
+USER vscode
+WORKDIR /workspaces/mojo
 SHELL ["/bin/bash", "-c"]
 
-# 'vscode' ユーザーとして実行
-USER vscode
+# Magicを直接インストール
+RUN curl -sSL https://magic.modular.com | bash
 
-# 'magic'をインストールし、PATHを設定
-RUN curl -sSL https://magic.modular.com | bash && \
-    echo 'export PATH="$HOME/.modular/bin:$PATH"' >> ~/.bashrc
+# Magicのパスを通す（インストールスクリプトによって異なる場合があります）
+ENV PATH="/home/vscode/.modular/bin:${PATH}"
 
-# 環境変数PATHを永続的に設定
-ENV PATH="/home/vscode/.modular/bin:$PATH"
+# プロジェクトの初期化: magic.yamlが存在しない場合のみプロジェクトを初期化
+RUN if [ ! -f ./magic.yaml ]; then magic init . --format mojoproject; fi
 
-# 必要に応じて、作業ディレクトリを設定（例: /workspace）
-# WORKDIR /workspace
+# magic shell-hook を設定し、bashの初期化ファイルに追加
+RUN magic shell-hook --shell bash >> ~/.bashrc
+
+# シェルプロファイルに.bashrcを読み込む設定を追加（ログインシェル用）
+RUN echo 'source ~/.bashrc' >> ~/.bash_profile
+
+# デフォルトのシェルをbashに設定
+ENV SHELL=/bin/bash
+
+# エントリーポイントをbashに設定
+CMD [ "bash" ]
