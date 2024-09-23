@@ -20,23 +20,17 @@ RUN useradd -m vscode && echo "vscode ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/
     chmod 0440 /etc/sudoers.d/nopasswd
 
 USER vscode
-WORKDIR /workspaces/mojo
 SHELL ["/bin/bash", "-c"]
+
+# カレントディレクトリ名を引数として受け取る
+ARG CURRENT_DIR
+WORKDIR /workspaces/${CURRENT_DIR}
 
 # Magicを直接インストール
 RUN curl -sSL https://magic.modular.com | bash
 
 # Magicのパスを通す（インストールスクリプトによって異なる場合があります）
 ENV PATH="/home/vscode/.modular/bin:${PATH}"
-
-# プロジェクトの初期化: magic.yamlが存在しない場合のみプロジェクトを初期化
-RUN if [ ! -f ./magic.yaml ]; then magic init . --format mojoproject; fi
-
-# magic shell-hook を設定し、bashの初期化ファイルに追加
-RUN magic shell-hook --shell bash >> ~/.bashrc
-
-# シェルプロファイルに.bashrcを読み込む設定を追加（ログインシェル用）
-RUN echo 'source ~/.bashrc' >> ~/.bash_profile
 
 # デフォルトのシェルをbashに設定
 ENV SHELL=/bin/bash

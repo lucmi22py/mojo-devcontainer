@@ -1,8 +1,12 @@
 {
     "name": "Mojo Dev Container",
     "build": {
-        "dockerfile": "Dockerfile"
+        "dockerfile": "Dockerfile",
+		"args": {
+            "CURRENT_DIR": "${localWorkspaceFolderBasename}"
+        }
     },
+	"postCreateCommand": "/bin/bash -c .devcontainer/postCreateCommand.sh",
     "customizations": {
 		"vscode": {
 			"settings": {
